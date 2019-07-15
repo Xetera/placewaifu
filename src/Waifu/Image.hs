@@ -1,15 +1,26 @@
 module Waifu.Image where
 
 import Codec.Picture
+import Codec.Picture.Metadata
+import Control.Monad.IO.Class
+import Control.Monad.Trans.Except
 import System.Directory
+import Waifu.Utils
+
+type ImageM = ExceptT String IO
+
+type ImageData = (DynamicImage, Metadatas)
 
 placeholderPath :: FilePath
 placeholderPath = "assets"
 
-getImage :: IO (Either String DynamicImage)
-getImage = readImage "assets/kawaii.jpg"
+getImage :: FilePath -> ImageM ImageData
+getImage = ExceptT <$> readImageWithMetadata
 
-allPlaceholders :: IO (Either String [DynamicImage])
+allPlaceholders :: ImageM [ImageData]
 allPlaceholders = do
-  dirs <- listDirectory placeholderPath
-  sequence <$> traverse readImage dirs
+  dirs <- liftIO $ readDir placeholderPath
+  traverse getImage dirs
+
+randomPlaceholder :: [ImageData] -> IO DynamicImage
+randomPlaceholder images = fst <$> randomList images

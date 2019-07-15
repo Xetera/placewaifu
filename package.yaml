@@ -23,6 +23,7 @@ dependencies:
   - base >= 4.7 && < 5
   - text
   - directory
+  - filepath
   - bytestring
   - transformers
   - servant
@@ -34,6 +35,31 @@ dependencies:
   - servant-JuicyPixels
   - mtl
   - random
+
+default-extensions:
+  - BlockArguments
+  - ConstraintKinds
+  - DataKinds
+  - DeriveFunctor
+  - DeriveGeneric
+  - FlexibleContexts
+  - FunctionalDependencies
+  - GADTs
+  - LambdaCase
+  - MultiParamTypeClasses
+  - MultiWayIf
+  - NamedFieldPuns
+  - OverloadedStrings
+  - PatternSynonyms
+  - PolyKinds
+  - RankNTypes
+  - ScopedTypeVariables
+  - TupleSections
+  - TypeApplications
+  - TypeOperators
+  - TypeFamilies
+  - ViewPatterns
+
 
 library:
   source-dirs: src
