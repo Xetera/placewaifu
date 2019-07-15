@@ -9,22 +9,20 @@ import Network.Wai
 import Servant
 import Servant.API
 import Waifu.Api
+import Debug.Trace
 import Waifu.Image
-  -- withExceptT handleOops $ liftEither image
+import qualified Data.ByteString.Lazy as LBS
 
--- handleOops :: String -> ServantErr
--- handleOops e = err500 {errBody = "oops"}
--- serveImage :: Handler ImageAPI
--- serveImage = do
---   image <- liftIO getImage
 server :: Server ImageAPI
 server = serveImage
 
 serveImage :: Handler DynamicImage
 serveImage = do
-  imageE <- liftIO getImage
+  imageE <- liftIO $ runExceptT randomPlaceholder
   case imageE of
-    Left _ -> throwError $ err500 {errBody = "made an oopsie"}
+    Left e -> do
+      liftIO $ putStrLn e
+      throwError $ err500 {errBody = "Error occurred"}
     Right image -> return image
 
 app :: Application

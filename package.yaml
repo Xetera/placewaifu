@@ -23,6 +23,7 @@ dependencies:
   - base >= 4.7 && < 5
   - text
   - directory
+  - filepath
   - bytestring
   - transformers
   - servant
