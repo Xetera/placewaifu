@@ -1,6 +1,6 @@
 module Main where
 
-import Lib
+import Waifu
 
 main :: IO ()
 main = start
