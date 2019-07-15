@@ -22,6 +22,7 @@ description: Please see the README on GitHub at <https://github.com/Xetera/place
 dependencies:
   - base >= 4.7 && < 5
   - text
+  - directory
   - bytestring
   - transformers
   - servant
@@ -32,6 +33,7 @@ dependencies:
   - JuicyPixels
   - servant-JuicyPixels
   - mtl
+  - random
 
 library:
   source-dirs: src
