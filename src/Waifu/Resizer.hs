@@ -1,0 +1,1 @@
+module Waifu.Resizer where
