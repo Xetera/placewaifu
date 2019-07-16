@@ -1,7 +1,7 @@
 name: placewaifu
 version: 0.1.0.0
 github: "Xetera/placewaifu"
-license: BSD3
+license: MIT
 author: "Xetera"
 copyright: "2019 Xetera"
 
@@ -54,11 +54,49 @@ default-extensions:
   - TypeFamilies
   - ViewPatterns
 
-executable:
-  main: Main.hs
+library:
   source-dirs: src
   ghc-options:
     - -threaded
     - -rtsopts
     - -with-rtsopts=-N
     - -Wall
+
+executables:
+  placewaifu:
+    main: Main.hs
+    source-dirs: app
+    ghc-options:
+      - -threaded
+      - -rtsopts
+      - -with-rtsopts=-N
+      - -Wall
+    dependencies:
+      - placewaifu
+
+tests:
+  test:
+    main: Spec.hs
+    source-dirs: test
+    ghc-options:
+      - -threaded
+      - -rtsopts
+      - -with-rtsopts=-N
+      - -Wall
+    dependencies:
+      - hspec
+      - placewaifu
+      - QuickCheck
+
+benchmarks:
+  bench:
+    main: Benchmark.hs
+    source-dirs: benchmark
+    ghc-options:
+      - -threaded
+      - -rtsopts
+      - -with-rtsopts=-N
+      - -Wall
+    dependencies:
+      - criterion
+      - placewaifu

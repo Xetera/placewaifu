@@ -1,18 +1,11 @@
 module Waifu.Image
-  ( loadImages
-  , findClosest
+  ( findClosest
   , resize
   ) where
 
 import qualified Graphics.Image as I
 
 import Waifu.Core
-import Waifu.Util
-
-loadImages :: FilePath -> IO (Either String [Image])
-loadImages path = do
-  dirs <- readDir path
-  sequence <$> traverse I.readImage dirs
 
 findClosest :: Int -> [Image] -> Image
 findClosest targetWidth = foldl1 closer

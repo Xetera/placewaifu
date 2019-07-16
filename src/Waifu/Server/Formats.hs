@@ -1,4 +1,4 @@
-module Waifu.Servant
+module Waifu.Server.Formats
     ( PNG
     , JPG
     ) where
@@ -7,7 +7,7 @@ import qualified Graphics.Image as I
 
 import Servant
 
-import Waifu.Core
+import Waifu.Core (Image)
 
 data PNG
 

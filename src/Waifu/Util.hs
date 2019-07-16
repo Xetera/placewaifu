@@ -1,7 +1,7 @@
 module Waifu.Util
-    ( randomList
-    , readDir
-    ) where
+  ( randomList
+  , readDir
+  ) where
 
 import System.Directory (listDirectory)
 import System.FilePath.Posix ((</>))
