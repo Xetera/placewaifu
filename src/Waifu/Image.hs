@@ -1,9 +1,9 @@
 module Waifu.Image
-  ( Width
-  , Placeholder(..)
-  , placeholderPath
-  , allPlaceholders
-  , findClosestWidth
+  ( Placeholder(..)
+  , height
+  , width
+  , loadPlaceholders
+  , findClosest
   , resize
   ) where
 
@@ -16,42 +16,39 @@ import Codec.Picture.RGBA8
 
 import Waifu.Util
 
-type Width = Int
+data Placeholder = Placeholder
+  { image :: DynamicImage
+  , metadata :: Metadatas
+  }
 
-data Placeholder = Placeholder { image :: DynamicImage, metadata :: Metadatas }
+height :: Placeholder -> Maybe Word
+height = MT.lookup Height . metadata
 
-placeholderPath :: FilePath
-placeholderPath = "assets"
+width :: Placeholder -> Maybe Word
+width = MT.lookup Width . metadata
 
-allPlaceholders :: IO (Either String [Placeholder])
-allPlaceholders = do
-  dirs <- liftIO $ readDir placeholderPath
-  sequence <$> traverse ((fmap . fmap) (uncurry Placeholder) . readImageWithMetadata) dirs
+loadPlaceholders :: FilePath -> IO (Either String [Placeholder])
+loadPlaceholders path = do
+  dirs <- liftIO $ readDir path
+  xs <- sequence <$> traverse readImageWithMetadata dirs
+  pure $ (fmap . fmap) (uncurry Placeholder) xs
 
-findClosestWidth :: Width -> [Placeholder] -> DynamicImage
-findClosestWidth width = image . foldl1 (iter width)
+findClosest :: Word -> [Placeholder] -> DynamicImage
+findClosest targetWidth = image . foldl1 closer
   where
-    iter :: Width -> Placeholder -> Placeholder -> Placeholder
-    iter target closest current =
-      case MT.lookup Width (metadata current) of
-        Nothing -> closest
-        Just currentWidth ->
-          case MT.lookup Width (metadata closest) of
-            Nothing -> closest
-            Just closestWidth ->
-              if abs (fromIntegral currentWidth - target) >
-                 abs (fromIntegral closestWidth - target)
-                then closest
-                else current
+    dist x y = abs (x - y)
+    closer x y = maybe x id $ do
+      wx <- fromIntegral <$> width x
+      wy <- fromIntegral <$> width y
+      if dist wx targetWidth <= dist wy targetWidth
+        then pure x
+        else pure y
 
-resize :: Width -> Placeholder -> DynamicImage
-resize width Placeholder { image, metadata } =
-  case MT.lookup Width metadata of
-    Nothing -> image
-    Just size ->
-      case MT.lookup Height metadata of
-        Nothing -> image
-        Just currentHeight ->
-          let ratio = width `div` fromIntegral size
-              height = fromIntegral $ currentHeight * fromIntegral ratio
-           in ImageRGBA8 $ scaleBilinear width height (fromDynamicImage image)
+resize :: Word -> Placeholder -> DynamicImage
+resize targetWidth placeholder = maybe (image placeholder) id $ do
+  h <- height placeholder
+  w <- width placeholder
+  let ratio = targetWidth `div` fromIntegral w
+      w' = fromIntegral w
+      h' = fromIntegral $ h * fromIntegral ratio
+  pure . ImageRGBA8 . scaleBilinear w' h' . fromDynamicImage $ image placeholder

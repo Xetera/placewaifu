@@ -7,11 +7,11 @@ import Waifu.Server
 
 main :: IO ()
 main = do
-  placeholdersE <- allPlaceholders
-  case placeholdersE of
+  mxs <- loadPlaceholders "./assets"
+  case mxs of
     Left err -> do
       putStrLn "Could not start server"
       putStrLn err
-    Right placeholders -> do
+    Right xs -> do
       putStrLn "Starting server..."
-      run 1234 (app placeholders)
+      run 1234 (app xs)

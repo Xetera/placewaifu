@@ -20,7 +20,7 @@ runWaifuT :: MonadIO m => [Placeholder] -> WaifuT m a -> m a
 runWaifuT images f = runReaderT f images
 
 type ImageAPI
-   =    "image" :> Capture "width" Int :> Get '[PNG] DynamicImage
+   =    "image" :> Capture "width" Word :> Get '[PNG] DynamicImage
    :<|> "image" :> Get '[PNG] DynamicImage
 
 server :: [Placeholder] -> Server ImageAPI
@@ -32,17 +32,16 @@ serverT ::
   => ServerT ImageAPI (WaifuT m)
 serverT = serveWidth :<|> randomImage
   where
-    serveWidth :: Width -> WaifuT m DynamicImage
-    serveWidth width = do
+    serveWidth :: Word -> WaifuT m DynamicImage
+    serveWidth targetWidth = do
       placeholders <- ask
-      -- choice <- liftIO $ randomPlaceholder placeholders
-      return $ findClosestWidth width placeholders
+      pure $ findClosest targetWidth placeholders
 
     randomImage :: WaifuT m DynamicImage
     randomImage = do
       placeholders <- ask
       placeholder <- liftIO $ randomList placeholders
-      liftIO . return $ image placeholder
+      pure $ image placeholder
 
 app :: [Placeholder] -> Application
 app = serve (Proxy @ImageAPI) . server
