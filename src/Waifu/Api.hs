@@ -8,9 +8,10 @@ import Servant.API.ContentTypes
 import Servant.JuicyPixels
 import Waifu.Image
 
-type WaifuT m = ReaderT [ImageData] m
+type WaifuT m = ReaderT [PlaceholderData] m
 
-type ImageAPI = "image" :> Get '[ PNG] DynamicImage
+type ImageAPI
+   = "image" :> Capture "width" Int :> Get '[ PNG] DynamicImage :<|> "image" :> Get '[ PNG] DynamicImage
 
-runWaifuT :: MonadIO m => [ImageData] -> WaifuT m a -> m a
+runWaifuT :: MonadIO m => [PlaceholderData] -> WaifuT m a -> m a
 runWaifuT images f = runReaderT f images

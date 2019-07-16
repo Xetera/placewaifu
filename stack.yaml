@@ -29,7 +29,7 @@ resolver: lts-13.28
 #   - auto-update
 #   - wai
 packages:
-- .
+  - .
 # Dependency packages to be pulled from upstream that are not in the resolver.
 # These entries can reference officially published versions as well as
 # forks / in-progress versions pinned to a git hash. For example:
@@ -39,8 +39,8 @@ packages:
 # - git: https://github.com/commercialhaskell/stack.git
 #   commit: e7b331f14bcffb8367cd58fbfc8b40ec7642100a
 #
-# extra-deps: []
-
+extra-deps:
+  - JuicyPixels-util-0.2@sha256:54df721dc1194e3f1934a7696274e12479851d26bd440e92fce58af5c11b7fa9,929
 # Override default flag values for local packages and extra-deps
 # flags: {}
 

@@ -33,6 +33,8 @@ dependencies:
   - warp
   - JuicyPixels
   - servant-JuicyPixels
+  - JuicyPixels-extra
+  - JuicyPixels-util
   - mtl
   - random
 
@@ -59,7 +61,6 @@ default-extensions:
   - TypeOperators
   - TypeFamilies
   - ViewPatterns
-
 
 library:
   source-dirs: src
