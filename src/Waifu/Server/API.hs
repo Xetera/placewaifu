@@ -3,18 +3,17 @@ module Waifu.Server.API
     ) where
 
 import Control.Monad.Except
-import Control.Monad.Reader
 
 import Servant
 
-import Waifu.Core
 import Waifu.Image
 import Waifu.Server.Formats
-import Waifu.Util
+import Waifu.Server.Stack
 
 type ImageAPI
-  =    "image" :> Capture "width" Int :> Capture "height" Int :> Get '[PNG, JPG] Image
-  :<|> "image" :> Get '[PNG, JPG] Image
+  =    "image" :> Capture "width" Word :> Capture "height" Word :> Get '[SVGXML] Image
+  :<|> "image" :> Capture "length" Word :> Get '[SVGXML] Image
+  :<|> "image" :> Get '[SVGXML] Image
 
 api :: [Image] -> Application
 api = serve (Proxy @ImageAPI) . server
@@ -23,15 +22,13 @@ server :: [Image] -> Server ImageAPI
 server images = hoistServer (Proxy @ImageAPI) (runWaifuT images) serverT
 
 serverT :: forall m. (MonadIO m, MonadError ServantErr m) => ServerT ImageAPI (WaifuT m)
-serverT = getRandomSized :<|> getRandom
+serverT = getRandomResized :<|> getRandomSquare :<|> getRandom
   where
-    getRandomSized :: Int -> Int -> WaifuT m Image
-    getRandomSized w h = do
-      images <- ask
-      image <- liftIO $ randomList images
-      pure $ resize (w, h) image
+    getRandomResized :: Word -> Word -> WaifuT m Image
+    getRandomResized w h = resize (w, h) <$> askRandomImage
+
+    getRandomSquare :: Word -> WaifuT m Image
+    getRandomSquare s = resize (s, s) <$> askRandomImage
 
     getRandom :: WaifuT m Image
-    getRandom = do
-      images <- ask
-      liftIO $ randomList images
+    getRandom = askRandomImage

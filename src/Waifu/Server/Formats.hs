@@ -1,26 +1,42 @@
 module Waifu.Server.Formats
-    ( PNG
-    , JPG
+    ( SVGXML
     ) where
 
-import qualified Graphics.Image as I
+import qualified Data.ByteString.Lazy as BL
+import qualified Data.ByteString.Builder as BL
 
 import Servant
 
-import Waifu.Core (Image)
+import Waifu.Image
 
-data PNG
+data SVGXML
 
-instance Accept PNG where
-    contentType _ = "image/png"
+instance Accept SVGXML where
+  contentType _ = "image/svg+xml"
 
-instance MimeRender PNG Image where
-    mimeRender _ = I.encode I.PNG []
+instance MimeRender SVGXML Image where
+  mimeRender _ = toSVG
 
-data JPG
-
-instance Accept JPG where
-    contentType _ = "image/jpg"
-
-instance MimeRender JPG Image where
-    mimeRender _ = I.encode I.JPG []
+toSVG :: Image -> BL.ByteString
+toSVG Image { imgBase64, imgSize = (w, h), imgResize = (w', h'), imgFormat }
+  = BL.toLazyByteString $ mconcat
+    [ "<svg xmlns=\"http://www.w3.org/2000/svg\" xmlns:xlink=\"http://www.w3.org/1999/xlink\" width=\""
+    , BL.wordDec w'
+    , "\" height=\""
+    , BL.wordDec h'
+    , "\" viewBox=\"0 0 "
+    , BL.wordDec w
+    , " "
+    , BL.wordDec h
+    , "\" preserveAspectRatio=\"xMidYMid slice\">"
+    , "<image xlink:href=\"data:image/"
+    , BL.stringUtf8 imgFormat
+    , ";base64,"
+    , BL.byteString imgBase64
+    , "\" width=\""
+    , BL.wordDec w
+    , "\" height=\""
+    , BL.wordDec h
+    , "\"></image>"
+    , "</svg>"
+    ]

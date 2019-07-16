@@ -1,22 +1,43 @@
 module Waifu.Image
-  ( findClosest
-  , resize
-  ) where
+    ( Image(..)
+    , fromByteString
+    , resize
+    ) where
 
-import qualified Graphics.Image as I
+import qualified Codec.Picture as P
+import qualified Codec.Picture.Metadata as P
+import qualified Data.ByteString as B
+import qualified Data.ByteString.Base64 as B
 
-import Waifu.Core
+data Image = Image
+    { imgBase64 :: B.ByteString
+    , imgSize   :: (Word, Word)
+    , imgResize :: (Word, Word)
+    , imgFormat :: String
+    }
 
-findClosest :: Int -> [Image] -> Image
-findClosest targetWidth = foldl1 closer
-  where
-    dist x y = abs (x - y)
-    closer x y =
-      let wx = I.cols x
-          wy = I.cols y
-      in if dist wx targetWidth <= dist wy targetWidth
-          then x
-          else y
+fromByteString :: B.ByteString -> Image
+fromByteString bs = Image
+    { imgBase64 = B.encode bs
+    , imgSize   = size
+    , imgResize = size
+    , imgFormat = format
+    }
+    where
+        size :: (Word, Word)
+        size = (getMeta P.Width, getMeta P.Height)
 
-resize :: (Int, Int) -> Image -> Image
-resize = I.resize I.Bilinear I.Edge
+        format :: String
+        format = case getMeta P.Format of
+            P.SourceJpeg -> "jpeg"
+            P.SourcePng  -> "png"
+            _ -> "unsupported image format"
+
+        metadata :: P.Metadatas
+        metadata = either (const $ error "could not decode image") snd (P.decodeImageWithMetadata bs)
+
+        getMeta :: P.Keys a -> a
+        getMeta = maybe (error "could not read metadata") id . flip P.lookup metadata
+
+resize :: (Word, Word) -> Image -> Image
+resize size img = img { imgResize = size }
