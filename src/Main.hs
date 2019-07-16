@@ -1,13 +1,12 @@
-module Waifu
-  ( start
-  ) where
+module Main where
 
 import Network.Wai.Handler.Warp
+
 import Waifu.Image
 import Waifu.Server
 
-start :: IO ()
-start = do
+main :: IO ()
+main = do
   placeholdersE <- allPlaceholders
   case placeholdersE of
     Left err -> do

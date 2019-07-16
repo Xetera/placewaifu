@@ -3,40 +3,32 @@ version: 0.1.0.0
 github: "Xetera/placewaifu"
 license: BSD3
 author: "Xetera"
-maintainer: "example@example.com"
 copyright: "2019 Xetera"
 
 extra-source-files:
   - README.md
   - ChangeLog.md
 
-# Metadata used when publishing your package
-# synopsis:            Short description of your package
-# category:            Web
-
-# To avoid duplicated efforts in documentation and dealing with the
-# complications of embedding Haddock markup inside cabal files, it is
-# common to point users to the README.md file.
-description: Please see the README on GitHub at <https://github.com/Xetera/placewaifu#readme>
+description: Please see the README
 
 dependencies:
-  - base >= 4.7 && < 5
-  - text
+  - base
+  - bytestring
   - directory
   - filepath
-  - bytestring
-  - transformers
-  - servant
-  - servant-server
-  - time
-  - wai
-  - warp
   - JuicyPixels
-  - servant-JuicyPixels
   - JuicyPixels-extra
   - JuicyPixels-util
   - mtl
   - random
+  - servant
+  - servant-JuicyPixels
+  - servant-server
+  - text
+  - time
+  - transformers
+  - wai
+  - warp
 
 default-extensions:
   - BlockArguments
@@ -62,27 +54,11 @@ default-extensions:
   - TypeFamilies
   - ViewPatterns
 
-library:
+executable:
+  main: Main.hs
   source-dirs: src
-
-executables:
-  placewaifu-exe:
-    main: Main.hs
-    source-dirs: app
-    ghc-options:
-      - -threaded
-      - -rtsopts
-      - -with-rtsopts=-N
-    dependencies:
-      - placewaifu
-
-tests:
-  placewaifu-test:
-    main: Spec.hs
-    source-dirs: test
-    ghc-options:
-      - -threaded
-      - -rtsopts
-      - -with-rtsopts=-N
-    dependencies:
-      - placewaifu
+  ghc-options:
+    - -threaded
+    - -rtsopts
+    - -with-rtsopts=-N
+    - -Wall

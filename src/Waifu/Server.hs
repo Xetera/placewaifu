@@ -1,21 +1,29 @@
-{-# LANGUAGE TypeApplications #-}
+module Waifu.Server
+  ( app
+  ) where
 
-module Waifu.Server where
-
-import Codec.Picture
 import Control.Monad.Except
 import Control.Monad.Reader
-import Control.Monad.Trans.Class
-import qualified Data.ByteString.Lazy as LBS
-import Debug.Trace
+
+import Codec.Picture
+
 import Network.Wai
 import Servant
-import Servant.API
-import Waifu.Api
-import Waifu.Image
-import Waifu.Resizer
+import Servant.JuicyPixels
 
-server :: [PlaceholderData] -> Server ImageAPI
+import Waifu.Image
+import Waifu.Util
+
+type WaifuT m = ReaderT [Placeholder] m
+
+runWaifuT :: MonadIO m => [Placeholder] -> WaifuT m a -> m a
+runWaifuT images f = runReaderT f images
+
+type ImageAPI
+   =    "image" :> Capture "width" Int :> Get '[PNG] DynamicImage
+   :<|> "image" :> Get '[PNG] DynamicImage
+
+server :: [Placeholder] -> Server ImageAPI
 server placeholders =
   hoistServer (Proxy @ImageAPI) (runWaifuT placeholders) serverT
 
@@ -24,16 +32,17 @@ serverT ::
   => ServerT ImageAPI (WaifuT m)
 serverT = serveWidth :<|> randomImage
   where
-    randomImage :: WaifuT m DynamicImage
-    randomImage = do
-      placeholders <- ask
-      placeholder <- liftIO $ randomPlaceholder placeholders
-      liftIO . return $ fst placeholder
     serveWidth :: Width -> WaifuT m DynamicImage
     serveWidth width = do
       placeholders <- ask
       -- choice <- liftIO $ randomPlaceholder placeholders
       return $ findClosestWidth width placeholders
 
-app :: [PlaceholderData] -> Application
+    randomImage :: WaifuT m DynamicImage
+    randomImage = do
+      placeholders <- ask
+      placeholder <- liftIO $ randomList placeholders
+      liftIO . return $ image placeholder
+
+app :: [Placeholder] -> Application
 app = serve (Proxy @ImageAPI) . server
