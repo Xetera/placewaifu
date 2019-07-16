@@ -4,4 +4,4 @@ packages:
   - .
 
 extra-deps:
-  - JuicyPixels-util-0.2@sha256:54df721dc1194e3f1934a7696274e12479851d26bd440e92fce58af5c11b7fa9,929
+  - hip-1.5.3.0@sha256:11a3b06a222abae8d2f1da717890b24392de1df22a2c2bb388922565a73dd9be,6400

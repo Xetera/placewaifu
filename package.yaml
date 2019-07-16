@@ -16,13 +16,10 @@ dependencies:
   - bytestring
   - directory
   - filepath
-  - JuicyPixels
-  - JuicyPixels-extra
-  - JuicyPixels-util
+  - hip
   - mtl
   - random
   - servant
-  - servant-JuicyPixels
   - servant-server
   - text
   - time
@@ -37,6 +34,7 @@ default-extensions:
   - DeriveFunctor
   - DeriveGeneric
   - FlexibleContexts
+  - FlexibleInstances
   - FunctionalDependencies
   - GADTs
   - LambdaCase

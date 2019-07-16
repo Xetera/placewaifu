@@ -7,7 +7,7 @@ import Waifu.Server
 
 main :: IO ()
 main = do
-  mxs <- loadPlaceholders "./assets"
+  mxs <- loadImages "./assets"
   case mxs of
     Left err -> do
       putStrLn "Could not start server"

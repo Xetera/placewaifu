@@ -5,43 +5,34 @@ module Waifu.Server
 import Control.Monad.Except
 import Control.Monad.Reader
 
-import Codec.Picture
-
 import Network.Wai
 import Servant
-import Servant.JuicyPixels
 
+import Waifu.Core
 import Waifu.Image
+import Waifu.Servant
 import Waifu.Util
 
-type WaifuT m = ReaderT [Placeholder] m
-
-runWaifuT :: MonadIO m => [Placeholder] -> WaifuT m a -> m a
-runWaifuT images f = runReaderT f images
-
 type ImageAPI
-   =    "image" :> Capture "width" Word :> Get '[PNG] DynamicImage
-   :<|> "image" :> Get '[PNG] DynamicImage
+  =    "image" :> Capture "height" Int :> Capture "width" Int :> Get '[PNG, JPG] Image
+  :<|> "image" :> Get '[PNG, JPG] Image
 
-server :: [Placeholder] -> Server ImageAPI
-server placeholders =
-  hoistServer (Proxy @ImageAPI) (runWaifuT placeholders) serverT
-
-serverT ::
-     forall m. (MonadIO m, MonadError ServantErr m)
-  => ServerT ImageAPI (WaifuT m)
-serverT = serveWidth :<|> randomImage
-  where
-    serveWidth :: Word -> WaifuT m DynamicImage
-    serveWidth targetWidth = do
-      placeholders <- ask
-      pure $ findClosest targetWidth placeholders
-
-    randomImage :: WaifuT m DynamicImage
-    randomImage = do
-      placeholders <- ask
-      placeholder <- liftIO $ randomList placeholders
-      pure $ image placeholder
-
-app :: [Placeholder] -> Application
+app :: [Image] -> Application
 app = serve (Proxy @ImageAPI) . server
+
+server :: [Image] -> Server ImageAPI
+server images = hoistServer (Proxy @ImageAPI) (runWaifuT images) serverT
+
+serverT :: forall m. (MonadIO m, MonadError ServantErr m) => ServerT ImageAPI (WaifuT m)
+serverT = getRandomSized :<|> getRandom
+  where
+    getRandomSized :: Int -> Int -> WaifuT m Image
+    getRandomSized h w = do
+      images <- ask
+      image <- liftIO $ randomList images
+      pure $ resize (h, w) image
+
+    getRandom :: WaifuT m Image
+    getRandom = do
+      images <- ask
+      liftIO $ randomList images

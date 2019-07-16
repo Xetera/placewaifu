@@ -1,54 +1,29 @@
 module Waifu.Image
-  ( Placeholder(..)
-  , height
-  , width
-  , loadPlaceholders
+  ( loadImages
   , findClosest
   , resize
   ) where
 
-import Control.Monad.IO.Class
+import qualified Graphics.Image as I
 
-import Codec.Picture
-import Codec.Picture.Extra
-import Codec.Picture.Metadata as MT
-import Codec.Picture.RGBA8
-
+import Waifu.Core
 import Waifu.Util
 
-data Placeholder = Placeholder
-  { image :: DynamicImage
-  , metadata :: Metadatas
-  }
+loadImages :: FilePath -> IO (Either String [Image])
+loadImages path = do
+  dirs <- readDir path
+  sequence <$> traverse I.readImage dirs
 
-height :: Placeholder -> Maybe Word
-height = MT.lookup Height . metadata
-
-width :: Placeholder -> Maybe Word
-width = MT.lookup Width . metadata
-
-loadPlaceholders :: FilePath -> IO (Either String [Placeholder])
-loadPlaceholders path = do
-  dirs <- liftIO $ readDir path
-  xs <- sequence <$> traverse readImageWithMetadata dirs
-  pure $ (fmap . fmap) (uncurry Placeholder) xs
-
-findClosest :: Word -> [Placeholder] -> DynamicImage
-findClosest targetWidth = image . foldl1 closer
+findClosest :: Int -> [Image] -> Image
+findClosest targetWidth = foldl1 closer
   where
     dist x y = abs (x - y)
-    closer x y = maybe x id $ do
-      wx <- fromIntegral <$> width x
-      wy <- fromIntegral <$> width y
-      if dist wx targetWidth <= dist wy targetWidth
-        then pure x
-        else pure y
+    closer x y =
+      let wx = I.cols x
+          wy = I.cols y
+      in if dist wx targetWidth <= dist wy targetWidth
+          then x
+          else y
 
-resize :: Word -> Placeholder -> DynamicImage
-resize targetWidth placeholder = maybe (image placeholder) id $ do
-  h <- height placeholder
-  w <- width placeholder
-  let ratio = targetWidth `div` fromIntegral w
-      w' = fromIntegral w
-      h' = fromIntegral $ h * fromIntegral ratio
-  pure . ImageRGBA8 . scaleBilinear w' h' . fromDynamicImage $ image placeholder
+resize :: (Int, Int) -> Image -> Image
+resize = I.resize I.Bilinear I.Edge
