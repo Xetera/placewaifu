@@ -26,6 +26,8 @@ dependencies:
   - transformers
   - wai
   - warp
+  - servant-blaze
+  - blaze-html
 
 default-extensions:
   - BlockArguments
