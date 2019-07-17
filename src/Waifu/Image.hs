@@ -2,12 +2,19 @@ module Waifu.Image
     ( Image(..)
     , Metadata(..)
     , fromByteString
+    , ImageOptions(..)
+    , ImageOutput
+    , ImageTransfrom
+    , transform
     , resize
+    , greyscale
+    , blur
+    , baseOptions
     ) where
 
-import Data.Aeson
 import qualified Codec.Picture as P
 import qualified Codec.Picture.Metadata as P
+import Data.Aeson
 import qualified Data.ByteString as B
 import qualified Data.ByteString.Base64 as B
 import qualified Data.Text.Encoding as T
@@ -17,7 +24,6 @@ data Image = Image
   , imgMeta   :: !Metadata
   , imgBase64 :: !B.ByteString
   , imgSize   :: !(Word, Word)
-  , imgResize :: !(Word, Word)
   , imgFormat :: !String
   }
 
@@ -45,7 +51,6 @@ fromByteString name meta bs = Image
   , imgMeta   = meta
   , imgBase64 = B.encode bs
   , imgSize   = size
-  , imgResize = size
   , imgFormat = format
   }
   where
@@ -66,5 +71,30 @@ fromByteString name meta bs = Image
     getMeta :: P.Keys a -> a
     getMeta = maybe (error "could not read metadata") id . flip P.lookup metadata
 
-resize :: (Word, Word) -> Image -> Image
-resize size img = img { imgResize = size }
+data ImageOptions = ImageOptions
+  { optSize      :: (Word, Word)
+  , optGreyscale :: Bool
+  , optBlur      :: Bool
+  }
+
+type ImageOutput = (Image, ImageOptions)
+type ImageTransfrom = ImageOptions -> ImageOptions
+
+transform :: ImageTransfrom -> Image -> ImageOutput
+transform f img = (img, f $ baseOptions img)
+
+resize :: (Word, Word) -> ImageTransfrom
+resize size img = img { optSize = size }
+
+greyscale :: ImageTransfrom
+greyscale img = img { optGreyscale = True }
+
+blur :: ImageTransfrom
+blur img = img { optBlur = True }
+
+baseOptions :: Image -> ImageOptions
+baseOptions Image { imgSize } = ImageOptions
+  { optSize      = imgSize
+  , optGreyscale = False
+  , optBlur      = False
+  }
