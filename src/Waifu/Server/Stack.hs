@@ -1,6 +1,8 @@
 module Waifu.Server.Stack
     ( WaifuT
+    , SetupT
     , runWaifuT
+    , runSetupT
     , askRandomImage
     , loadImages
     ) where
@@ -18,24 +20,32 @@ import Waifu.Image
 
 type WaifuT m = ReaderT [Image] m
 
-runWaifuT :: MonadIO m => [Image] -> WaifuT m a -> m a
+type SetupT m = ReaderT FilePath m
+
+runWaifuT :: [Image] -> WaifuT m a -> m a
 runWaifuT images f = runReaderT f images
 
 askRandomImage :: MonadIO m => WaifuT m Image
-askRandomImage = ask >>= liftIO . randomList
+askRandomImage = ask >>= randomList
 
-randomList :: [a] -> IO a
-randomList xs = (xs !!) <$> randomRIO (0, length xs - 1)
+runSetupT :: FilePath -> SetupT m a -> m a
+runSetupT assets f = runReaderT f assets
 
-loadMetadata :: FilePath -> IO (H.HashMap String Metadata)
-loadMetadata assetsFolder = Y.decodeFileThrow $ assetsFolder </> "metadata.yaml"
+randomList :: MonadIO m => [a] -> m a
+randomList xs = liftIO $ (xs !!) <$> randomRIO (0, length xs - 1)
 
-loadImages :: FilePath -> IO [Image]
-loadImages assetsFolder = do
-  ms <- loadMetadata assetsFolder
-  traverse (uncurry $ readImage assetsFolder) $ H.toList ms
+loadImages :: MonadIO m => SetupT m [Image]
+loadImages = do
+  ms <- loadMetadata
+  traverse (uncurry readImage) $ H.toList ms
 
-readImage :: FilePath -> String -> Metadata -> IO Image
-readImage assetsFolder name meta = do
-  img <- B.readFile $ assetsFolder </> "images" </> name
+loadMetadata :: MonadIO m => SetupT m (H.HashMap String Metadata)
+loadMetadata = do
+  assets <- ask
+  Y.decodeFileThrow $ assets </> "metadata.yaml"
+
+readImage :: MonadIO m => String -> Metadata -> SetupT m Image
+readImage name meta = do
+  assets <- ask
+  img <- liftIO . B.readFile $ assets </> "images" </> name
   pure $ fromByteString (takeBaseName name) meta img
