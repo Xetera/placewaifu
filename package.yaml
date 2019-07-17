@@ -13,10 +13,11 @@ description: Please see the README
 
 dependencies:
   - base
+  - base64-bytestring
   - bytestring
   - directory
   - filepath
-  - hip
+  - JuicyPixels
   - mtl
   - random
   - servant
@@ -56,11 +57,6 @@ default-extensions:
 
 library:
   source-dirs: src
-  ghc-options:
-    - -threaded
-    - -rtsopts
-    - -with-rtsopts=-N
-    - -Wall
 
 executables:
   placewaifu:
