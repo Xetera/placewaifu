@@ -3,9 +3,14 @@ module Waifu.Image
     , Metadata(..)
     , fromByteString
     , resize
+    , aspectRatio
+    , filterSimilarRatio
     ) where
 
+import Debug.Trace
 import Data.Aeson
+import Data.List (sortBy)
+import Data.Ord (comparing)
 import qualified Codec.Picture as P
 import qualified Codec.Picture.Metadata as P
 import qualified Data.ByteString as B
@@ -33,7 +38,7 @@ instance ToJSON Image where
 
 data Metadata = Metadata
   { metaSource :: !String
-  }
+  } 
 
 instance FromJSON Metadata where
   parseJSON = withObject "metadata" $ \v -> Metadata
@@ -66,11 +71,24 @@ fromByteString name meta bs = Image
     getMeta :: P.Keys a -> a
     getMeta = maybe (error "could not read metadata") id . flip P.lookup metadata
 
-filterSimilarRatio :: Float -> [Image] -> [Image]
-filterSimilarRatio chosenRatio = filter matching
+resize :: (Word, Word) -> Image -> Image
+resize size img = img { imgResize = size }
+
+aspectRatio' :: Integral a => (a, a) -> Float
+aspectRatio' (x, y) = fromIntegral x / fromIntegral y
+
+aspectRatio :: Image -> Float
+aspectRatio = aspectRatio' . imgSize
+
+filterSimilarRatio :: Integral a => (a, a) -> Float -> [Image] -> [Image]
+filterSimilarRatio (x, y) ratio images = takeWhile inRange matches
   where
-    matching :: Image -> Bool
-    matching image =
-      let imgRatio = aspectRatio image
-       in (imgRatio >= 0.75 && chosenRatio <= 1) ||
-          (imgRatio > 1.25 && chosenRatio < 1)
+    inRange :: Image -> Bool
+    inRange img =
+      let ar = aspectRatio img
+          bm = aspectRatio bestMatch
+       in (bm > 1 && bm * (1 - ratio) < ar) || (bm <= 1 && bm * (1 + ratio) > ar)
+    compareAspects :: Image -> Float
+    compareAspects img = abs $ aspectRatio img - aspectRatio' (x, y)
+    matches = sortBy (comparing compareAspects) images
+    bestMatch = traceShow (map aspectRatio matches) $ head matches

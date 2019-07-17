@@ -28,12 +28,7 @@ dependencies:
   - unordered-containers
   - wai
   - warp
-<<<<<<< HEAD
-  - servant-blaze
-  - blaze-html
-=======
   - yaml
->>>>>>> ee12698eaec5f7e93f4200c1d7d935a66cf12c3a
 
 default-extensions:
   - BlockArguments

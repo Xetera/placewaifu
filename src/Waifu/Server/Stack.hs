@@ -5,6 +5,7 @@ module Waifu.Server.Stack
     , runSetupT
     , askRandomImage
     , loadImages
+    , randomList
     ) where
 
 import Control.Monad.Reader
