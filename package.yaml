@@ -12,6 +12,7 @@ extra-source-files:
 description: Please see the README
 
 dependencies:
+  - aeson
   - base
   - base64-bytestring
   - bytestring

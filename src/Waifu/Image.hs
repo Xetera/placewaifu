@@ -5,28 +5,39 @@ module Waifu.Image
     , resize
     ) where
 
+import Data.Aeson
 import qualified Codec.Picture as P
 import qualified Codec.Picture.Metadata as P
 import qualified Data.ByteString as B
 import qualified Data.ByteString.Base64 as B
-import Data.Yaml (FromJSON(..), (.:))
-import qualified Data.Yaml as Y
+import qualified Data.Text.Encoding as T
 
 data Image = Image
-    { imgName   :: String
-    , imgMeta   :: Metadata
-    , imgBase64 :: B.ByteString
-    , imgSize   :: (Word, Word)
-    , imgResize :: (Word, Word)
-    , imgFormat :: String
+    { imgName   :: !String
+    , imgMeta   :: !Metadata
+    , imgBase64 :: !B.ByteString
+    , imgSize   :: !(Word, Word)
+    , imgResize :: !(Word, Word)
+    , imgFormat :: !String
     }
 
+instance ToJSON Image where
+    toJSON Image { imgName, imgMeta, imgBase64, imgSize, imgFormat } = object
+        [ "name"   .= imgName
+        , "width"  .= fst imgSize
+        , "height" .= snd imgSize
+        , "format" .= imgFormat
+        , "source" .= metaSource imgMeta
+        , "data"   .= T.decodeUtf8 imgBase64
+        ]
+
 data Metadata = Metadata
-    { metaSource :: String
+    { metaSource :: !String
     }
 
 instance FromJSON Metadata where
-    parseJSON = Y.withObject "metadata" $ \v -> Metadata <$> v .: "source"
+    parseJSON = withObject "metadata" $ \v -> Metadata
+        <$> v .: "source"
 
 fromByteString :: String -> Metadata -> B.ByteString -> Image
 fromByteString name meta bs = Image
@@ -43,9 +54,11 @@ fromByteString name meta bs = Image
 
         format :: String
         format = case getMeta P.Format of
-            P.SourceJpeg -> "jpeg"
-            P.SourcePng  -> "png"
-            _ -> "unsupported image format"
+            P.SourceBitmap -> "bmp"
+            P.SourceJpeg   -> "jpeg"
+            P.SourcePng    -> "png"
+            P.SourceTiff   -> "tiff"
+            x -> error $ "unsupported image format " <> show x
 
         metadata :: P.Metadatas
         metadata = either (const $ error "could not decode image") snd (P.decodeImageWithMetadata bs)
