@@ -15,7 +15,6 @@ dependencies:
   - base
   - base64-bytestring
   - bytestring
-  - directory
   - filepath
   - JuicyPixels
   - mtl
@@ -25,8 +24,10 @@ dependencies:
   - text
   - time
   - transformers
+  - unordered-containers
   - wai
   - warp
+  - yaml
 
 default-extensions:
   - BlockArguments

@@ -8,9 +8,13 @@ module Waifu.Server.Stack
 import Control.Monad.Reader
 
 import qualified Data.ByteString as B
+import qualified Data.HashMap.Strict as H
+import qualified Data.Yaml as Y
+
+import System.FilePath.Posix
+import System.Random (randomRIO)
 
 import Waifu.Image
-import Waifu.Util
 
 type WaifuT m = ReaderT [Image] m
 
@@ -20,8 +24,18 @@ runWaifuT images f = runReaderT f images
 askRandomImage :: MonadIO m => WaifuT m Image
 askRandomImage = ask >>= liftIO . randomList
 
+randomList :: [a] -> IO a
+randomList xs = (xs !!) <$> randomRIO (0, length xs - 1)
+
+loadMetadata :: FilePath -> IO (H.HashMap String Metadata)
+loadMetadata assetsFolder = Y.decodeFileThrow $ assetsFolder </> "metadata.yaml"
+
 loadImages :: FilePath -> IO [Image]
-loadImages path = do
-  dirs <- readDir path
-  xs <- traverse B.readFile dirs
-  pure $ map fromByteString xs
+loadImages assetsFolder = do
+  ms <- loadMetadata assetsFolder
+  traverse (uncurry $ readImage assetsFolder) $ H.toList ms
+
+readImage :: FilePath -> String -> Metadata -> IO Image
+readImage assetsFolder name meta = do
+  img <- B.readFile $ assetsFolder </> "images" </> name
+  pure $ fromByteString (takeBaseName name) meta img

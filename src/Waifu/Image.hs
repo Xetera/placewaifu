@@ -1,5 +1,6 @@
 module Waifu.Image
     ( Image(..)
+    , Metadata(..)
     , fromByteString
     , resize
     ) where
@@ -8,17 +9,30 @@ import qualified Codec.Picture as P
 import qualified Codec.Picture.Metadata as P
 import qualified Data.ByteString as B
 import qualified Data.ByteString.Base64 as B
+import Data.Yaml (FromJSON(..), (.:))
+import qualified Data.Yaml as Y
 
 data Image = Image
-    { imgBase64 :: B.ByteString
+    { imgName   :: String
+    , imgMeta   :: Metadata
+    , imgBase64 :: B.ByteString
     , imgSize   :: (Word, Word)
     , imgResize :: (Word, Word)
     , imgFormat :: String
     }
 
-fromByteString :: B.ByteString -> Image
-fromByteString bs = Image
-    { imgBase64 = B.encode bs
+data Metadata = Metadata
+    { metaSource :: String
+    }
+
+instance FromJSON Metadata where
+    parseJSON = Y.withObject "metadata" $ \v -> Metadata <$> v .: "source"
+
+fromByteString :: String -> Metadata -> B.ByteString -> Image
+fromByteString name meta bs = Image
+    { imgName   = name
+    , imgMeta   = meta
+    , imgBase64 = B.encode bs
     , imgSize   = size
     , imgResize = size
     , imgFormat = format

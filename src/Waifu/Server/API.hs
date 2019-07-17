@@ -7,7 +7,7 @@ import Control.Monad.Except
 import Servant
 
 import Waifu.Image
-import Waifu.Server.Formats
+import Waifu.Server.Servant
 import Waifu.Server.Stack
 
 type ImageAPI

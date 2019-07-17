@@ -1,4 +1,4 @@
-module Waifu.Server.Formats
+module Waifu.Server.Servant
     ( SVGXML
     ) where
 
