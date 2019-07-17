@@ -67,6 +67,7 @@ executables:
       - -with-rtsopts=-N
       - -Wall
     dependencies:
+      - optparse-applicative
       - placewaifu
 
 tests:
