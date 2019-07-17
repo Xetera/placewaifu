@@ -1,6 +1,12 @@
+<<<<<<< HEAD:src/Waifu/Server/Formats.hs
 module Waifu.Server.Formats
   ( SVGXML
   ) where
+=======
+module Waifu.Server.Servant
+    ( SVGXML
+    ) where
+>>>>>>> ee12698eaec5f7e93f4200c1d7d935a66cf12c3a:src/Waifu/Server/Servant.hs
 
 import qualified Data.ByteString.Builder as BL
 import qualified Data.ByteString.Lazy as BL

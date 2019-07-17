@@ -9,6 +9,6 @@ import Waifu.Server.Stack
 
 runServer :: FilePath -> Int -> IO ()
 runServer assets port = do
-  xs <- loadImages assets
+  xs <- runSetupT assets loadImages
   putStrLn "Starting server..."
   run port $ api xs

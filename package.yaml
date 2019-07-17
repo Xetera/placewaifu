@@ -12,10 +12,10 @@ extra-source-files:
 description: Please see the README
 
 dependencies:
+  - aeson
   - base
   - base64-bytestring
   - bytestring
-  - directory
   - filepath
   - JuicyPixels
   - mtl
@@ -25,10 +25,15 @@ dependencies:
   - text
   - time
   - transformers
+  - unordered-containers
   - wai
   - warp
+<<<<<<< HEAD
   - servant-blaze
   - blaze-html
+=======
+  - yaml
+>>>>>>> ee12698eaec5f7e93f4200c1d7d935a66cf12c3a
 
 default-extensions:
   - BlockArguments
@@ -68,31 +73,5 @@ executables:
       - -with-rtsopts=-N
       - -Wall
     dependencies:
-      - placewaifu
-
-tests:
-  test:
-    main: Spec.hs
-    source-dirs: test
-    ghc-options:
-      - -threaded
-      - -rtsopts
-      - -with-rtsopts=-N
-      - -Wall
-    dependencies:
-      - hspec
-      - placewaifu
-      - QuickCheck
-
-benchmarks:
-  bench:
-    main: Benchmark.hs
-    source-dirs: benchmark
-    ghc-options:
-      - -threaded
-      - -rtsopts
-      - -with-rtsopts=-N
-      - -Wall
-    dependencies:
-      - criterion
+      - optparse-applicative
       - placewaifu
