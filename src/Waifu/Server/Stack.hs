@@ -10,6 +10,7 @@ module Waifu.Server.Stack
     ) where
 
 import Control.Monad.Reader
+
 import qualified Data.ByteString as B
 import qualified Data.HashMap.Strict as H
 import qualified Data.Yaml as Y

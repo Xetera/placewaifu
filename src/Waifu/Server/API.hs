@@ -7,9 +7,9 @@ module Waifu.Server.API
 import Control.Monad.Reader
 
 import qualified Data.Set as S
+import qualified Data.Text as T
 
 import Servant
-import qualified Data.Text as T
 import Waifu.Image
 import Waifu.Server.Servant
 import Waifu.Server.Stack

@@ -14,13 +14,13 @@ module Waifu.Image
     , filterSimilarRatio
     ) where
 
-import Data.List
-import Data.Ord
 import qualified Codec.Picture as P
 import qualified Codec.Picture.Metadata as P
 import Data.Aeson
 import qualified Data.ByteString as B
 import qualified Data.ByteString.Base64 as B
+import Data.List
+import Data.Ord
 import qualified Data.Text.Encoding as T
 
 type Dimensions = (Word, Word)
