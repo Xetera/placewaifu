@@ -4,7 +4,7 @@ module Waifu.Image
     , fromByteString
     , ImageOptions(..)
     , ImageOutput
-    , ImageTransfrom
+    , ImageTransform
     , Dimensions
     , transform
     , resize
@@ -84,18 +84,18 @@ data ImageOptions = ImageOptions
   }
 
 type ImageOutput = (Image, ImageOptions)
-type ImageTransfrom = ImageOptions -> ImageOptions
+type ImageTransform = ImageOptions -> ImageOptions
 
-transform :: ImageTransfrom -> Image -> ImageOutput
+transform :: ImageTransform -> Image -> ImageOutput
 transform f img = (img, f $ baseOptions img)
 
-resize :: (Word, Word) -> ImageTransfrom
+resize :: (Word, Word) -> ImageTransform
 resize size img = img { optSize = size }
 
-greyscale :: ImageTransfrom
+greyscale :: ImageTransform
 greyscale img = img { optGreyscale = True }
 
-blur :: ImageTransfrom
+blur :: ImageTransform
 blur img = img { optBlur = True }
 
 baseOptions :: Image -> ImageOptions

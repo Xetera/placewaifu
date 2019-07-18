@@ -14,7 +14,7 @@ import Waifu.Server.Stack
 
 type Queries a = Bool -> Bool -> a
 
-withQueries :: (ImageTransfrom -> a) -> Queries a
+withQueries :: (ImageTransform -> a) -> Queries a
 withQueries f x1 x2 = f
   $ (if x1 then greyscale else id)
   . (if x2 then blur else id)
