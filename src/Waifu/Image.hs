@@ -105,21 +105,23 @@ baseOptions Image { imgSize } = ImageOptions
   , optBlur      = False
   }
 
-aspectRatio' :: Dimensions -> Double
-aspectRatio' (x, y) = fromIntegral x / fromIntegral y
-
 aspectRatio :: Image -> Double
 aspectRatio = aspectRatio' . imgSize
 
+aspectRatio' :: Dimensions -> Double
+aspectRatio' (w, h) = fromIntegral w / fromIntegral h
+
 filterSimilarRatio :: Dimensions -> Double -> [Image] -> [Image]
-filterSimilarRatio dims allowedError images = takeWhile inRange matches
+filterSimilarRatio size allowedError images = takeWhile inRange matches
   where
     inRange :: Image -> Bool
     inRange img =
       let ar = aspectRatio img
           bm = aspectRatio bestMatch
-        in (abs (ar - bm) / ar) < allowedError
+      in abs (ar - bm) / ar < allowedError
+
     distToTargetRatio :: Image -> Double
-    distToTargetRatio img = abs $ aspectRatio img - aspectRatio' dims
+    distToTargetRatio img = abs $ aspectRatio img - aspectRatio' size
+
     matches = sortBy (comparing distToTargetRatio) images
     bestMatch = head matches

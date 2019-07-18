@@ -30,7 +30,7 @@ askRandomImage :: (MonadReader [Image] m, MonadIO m) => m Image
 askRandomImage = ask >>= randomList
 
 askSimilarImage :: (MonadReader [Image] m, MonadIO m) => Dimensions -> Double -> m Image
-askSimilarImage dims ratio = asks (filterSimilarRatio dims ratio) >>= randomList
+askSimilarImage size allowedError = asks (filterSimilarRatio size allowedError) >>= randomList
 
 randomList :: MonadIO m => [a] -> m a
 randomList xs = liftIO $ (xs !!) <$> randomRIO (0, length xs - 1)
