@@ -6,10 +6,10 @@ module Waifu.Server.Stack
     , askRandomImage
     , askSimilarImage
     , loadImages
+    , randomList
     ) where
 
 import Control.Monad.Reader
-
 import qualified Data.ByteString as B
 import qualified Data.HashMap.Strict as H
 import qualified Data.Yaml as Y
@@ -23,7 +23,7 @@ type WaifuT m = ReaderT [Image] m
 
 type SetupT m = ReaderT FilePath m
 
-runWaifuT :: [Image] -> WaifuT m a -> m a
+runWaifuT :: MonadIO m => [Image] -> WaifuT m a -> m a
 runWaifuT images f = runReaderT f images
 
 askRandomImage :: MonadIO m => WaifuT m Image

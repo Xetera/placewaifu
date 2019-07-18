@@ -45,7 +45,7 @@ instance ToJSON Image where
 
 data Metadata = Metadata
   { metaSource :: !String
-  }
+  } 
 
 instance FromJSON Metadata where
   parseJSON = withObject "metadata" $ \v -> Metadata

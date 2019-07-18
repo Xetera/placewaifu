@@ -1,6 +1,8 @@
+{-# LANGUAGE TypeApplications #-}
+
 module Waifu.Server.API
-    ( api
-    ) where
+  ( api
+  ) where
 
 import Control.Monad.Except
 import Control.Monad.Reader

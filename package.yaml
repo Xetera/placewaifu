@@ -29,6 +29,7 @@ dependencies:
   - wai
   - warp
   - yaml
+  - monad-logger
 
 default-extensions:
   - BlockArguments

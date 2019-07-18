@@ -2,8 +2,8 @@ module Waifu.Server.Servant
     ( SVGXML
     ) where
 
-import qualified Data.ByteString.Lazy as BL
 import qualified Data.ByteString.Builder as BL
+import qualified Data.ByteString.Lazy as BL
 
 import Servant
 
