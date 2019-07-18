@@ -6,6 +6,7 @@ module Waifu.Server.API
 
 import Control.Monad.Reader
 
+import Data.Maybe
 import qualified Data.Set as S
 import qualified Data.Text as T
 
@@ -26,12 +27,12 @@ defaultImageHeaders = imageHeaders 86400
 type TransformQueries = S.Set String
 
 fromQueries :: TransformQueries -> ImageTransform
-fromQueries = foldl (.) id . map toTransform . S.toList
+fromQueries = foldl (.) id . catMaybes . map toTransform . S.toList
   where
     toTransform = \case
-      "greyscale" -> greyscale
-      "blur"      -> blur
-      _           -> error "unsupported transformation"
+      "greyscale" -> Just greyscale
+      "blur"      -> Just blur
+      _           -> Nothing
 
 type ImageAPI
   =    "image"
