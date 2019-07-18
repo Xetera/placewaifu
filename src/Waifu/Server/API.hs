@@ -61,16 +61,17 @@ server images = hoistServer (Proxy @ImageAPI) (runWaifuM images) serverT
 serverT :: ServerT ImageAPI WaifuM
 serverT = getRandomResized :<|> getRandomSquare :<|> getRandom :<|> getImages
   where
-
     getRandomResized :: Word -> Word -> TransformQueries -> WaifuM ImageResponse
-    getRandomResized w h qs = defaultImageHeaders . transform (fromQueries qs . resize (w, h)) <$> askSimilarImage (w, h) 0.3
+    getRandomResized w h qs
+      = defaultImageHeaders . transform (fromQueries qs . resize (w, h)) <$> askSimilarImage (w, h) 0.3
 
     getRandomSquare :: Word -> TransformQueries -> WaifuM ImageResponse
-    getRandomSquare s qs = defaultImageHeaders . transform (fromQueries qs . resize (s, s)) <$> askSimilarImage (s, s) 0.4
+    getRandomSquare s qs
+      = defaultImageHeaders . transform (fromQueries qs . resize (s, s)) <$> askSimilarImage (s, s) 0.4
 
     getRandom :: TransformQueries -> WaifuM ImageResponse
-    getRandom qs = defaultImageHeaders . transform (fromQueries qs) <$> askRandomImage
+    getRandom qs
+      = defaultImageHeaders . transform (fromQueries qs) <$> askRandomImage
 
     getImages :: WaifuM [Image]
     getImages = ask
-  
