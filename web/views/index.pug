@@ -1,0 +1,100 @@
+extends template.pug
+block body
+  include github_corner.pug
+block content
+  - const gettingStarted = `<img src="https://placewaifu.com/image/200">`
+  - const exampleImagesResponse = [{ name: "aoba", source: "https://myanimelist.net/anime/31953/New_Game/", height: 1000, width: 750, format: "png", data: "--base64--" }];
+
+  .banner-container
+    img.image.banner(src="../../assets/banner.jpg")
+  h1.title.is-size-1-tablet Placewaifu
+  p.subtitle.is-size-4-tablet An anime girl placeholder service. Not the one you need, but the one you deserve.
+
+  br
+
+  .columns
+    .column(style="max-width: 124px")
+      img(src="https://via.placeholder.com/100" style="max-width: 100px")
+    .column
+        p Ever wanted to use some placeholder images for your website and came across... #[i that]?
+        br
+        p It's convenient I guess, but nobody wants to look at this. Instead you want to look at cute anime girls... trust me.
+
+  br
+
+  h2.title Usage
+  p All you have to do is add an #[code img] tag like this and you'll get a random image at the right size.
+  pre
+    code.html #{gettingStarted}
+
+  a(href="/image_list.pug") View all images here
+
+  br
+  br
+
+  h2.title Endpoints
+  p There are multiple endpoints you can use to change the target image sizes.
+
+  .table-container
+    table.table.is-fullwidth
+      thead
+        tr
+          th Endpoint
+          th Description
+          th Response Type
+      tbody
+        tr
+          td #[code /image]
+          td Random image of any dimension
+          td #[code image/svg+xml]
+        tr
+          td #[code /image/:size]
+          td Random square image of length #[code :size]
+          td #[code image/svg+xml]
+        tr
+          td #[code /image/:width/:height]
+          td Random image of #[code :width] x #[code :height] dimensions
+          td #[code image/svg+xml]
+        tr
+          td #[code /images]
+          td A full list of all base64 encoded images
+          td #[code application/json]
+
+  p Example #[code /images] response
+
+  pre
+    code.json #{JSON.stringify(exampleImagesResponse, null, 2)}
+
+
+  .side-note
+    | ⚠ Images are returned as SVG so and not in the #[code image/png] format. Results may be unexpected
+    | when using #[code curl] or #[code fetch].
+
+  br
+
+  h2.title Available filters
+  p
+    | Image endpoints have a few filters that you can pick from and combine.
+    | #[code greyscale] and #[code blur] allow you to, well, make your images blurry or greyscale.
+
+  br
+
+  a(href="https://placewaifu.com/image/200?greyscale" target="_blank") https://placewaifu.com/image/200?greyscale
+
+  br
+  br
+  p You can also combine the filters as well
+
+  a(href="https://placewaifu.com/image/200/500?greyscale&blur" target="_blank") https://placewaifu.com/image/200/500?greyscale&blur
+
+  br
+  br
+
+  h2.title Adding new images
+  p 
+    | If you're interested in adding new images, make sure to head over to the #[a(href="https://github.com/xetera/placewaifu") github repository]
+    | and submit a pull request.
+
+  footer.footer
+    .content-has-text-centered
+      p Made with ❤️ by #[a(target="_blank" href="https://github.com/xetera") Xetera] and #[a(target="_blank" href="https://github.com/1Computer1") 1Computer1]

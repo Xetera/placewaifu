@@ -1,0 +1,40 @@
+pre {
+  padding: 10px 0 !important;
+}
+
+div.section {
+  padding: 1.5rem !important;
+}
+
+footer.footer {
+  text-align: center;
+  padding: 1.5rem 0 0;
+}
+
+h1 {
+  font-size: 12px;
+}
+
+.main {
+  display: flex;
+  justify-content: center;
+  flex-direction: column;
+}
+
+.banner-container {
+  margin-bottom: 15px;
+}
+
+.side-note {
+  margin: 10px 0;
+  padding: 5px 5px 0 15px;
+  border-left: 4px solid #dce92a;
+}
+
+@media (max-width: 786px) {
+  .github-corner svg {
+    width: 60px;
+    height: 60px;
+    z-index: 2;
+  }
+}

@@ -53,6 +53,8 @@ type ImageAPI
   :<|> "images"
     :> Get '[JSON] [Image]
 
+  :<|> Raw
+
 api :: [Image] -> Application
 api = serve (Proxy @ImageAPI) . server
 
@@ -60,7 +62,7 @@ server :: [Image] -> Server ImageAPI
 server images = hoistServer (Proxy @ImageAPI) (runWaifuM images) serverT
 
 serverT :: ServerT ImageAPI WaifuM
-serverT = getRandomResized :<|> getRandomSquare :<|> getRandom :<|> getImages
+serverT = getRandomResized :<|> getRandomSquare :<|> getRandom :<|> getImages :<|> serveWebsite
   where
     getRandomResized :: Word -> Word -> TransformQueries -> WaifuM ImageResponse
     getRandomResized w h qs
@@ -76,3 +78,6 @@ serverT = getRandomResized :<|> getRandomSquare :<|> getRandom :<|> getImages
 
     getImages :: WaifuM [Image]
     getImages = ask
+
+    serveWebsite :: ServerT Raw m
+    serveWebsite = serveDirectoryFileServer "web/dist"
