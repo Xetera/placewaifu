@@ -11,4 +11,4 @@ FROM ubuntu
 
 COPY --from=build /root/.local/bin/placewaifu .
 COPY ./assets ./assets
-CMD ["sh", "placewaifu"]
+CMD ./pacewaifu --assets=./assets
