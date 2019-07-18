@@ -105,7 +105,6 @@ baseOptions Image { imgSize } = ImageOptions
   , optBlur      = False
   }
 
-
 aspectRatio' :: Dimensions -> Double
 aspectRatio' (x, y) = fromIntegral x / fromIntegral y
 

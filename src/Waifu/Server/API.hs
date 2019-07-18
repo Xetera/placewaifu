@@ -4,7 +4,6 @@ module Waifu.Server.API
   ( api
   ) where
 
-import Control.Monad.Except
 import Control.Monad.Reader
 
 import Servant
@@ -46,19 +45,19 @@ api :: [Image] -> Application
 api = serve (Proxy @ImageAPI) . server
 
 server :: [Image] -> Server ImageAPI
-server images = hoistServer (Proxy @ImageAPI) (runWaifuT images) serverT
+server images = hoistServer (Proxy @ImageAPI) (runWaifuM images) serverT
 
-serverT :: forall m. (MonadIO m, MonadError ServantErr m) => ServerT ImageAPI (WaifuT m)
+serverT :: ServerT ImageAPI WaifuM
 serverT = getRandomResized :<|> getRandomSquare :<|> getRandom :<|> getImages
   where
-    getRandomResized :: Word -> Word -> Queries (WaifuT m ImageOutput)
+    getRandomResized :: Word -> Word -> Queries (WaifuM ImageOutput)
     getRandomResized w h = withQueries $ \f -> transform (f . resize (w, h)) <$> askSimilarImage (w, h) 0.3
 
-    getRandomSquare :: Word -> Queries (WaifuT m ImageOutput)
+    getRandomSquare :: Word -> Queries (WaifuM ImageOutput)
     getRandomSquare s = withQueries $ \f -> transform (f . resize (s, s)) <$> askSimilarImage (s, s) 0.4
 
-    getRandom :: Queries (WaifuT m ImageOutput)
+    getRandom :: Queries (WaifuM ImageOutput)
     getRandom = withQueries $ \f -> transform f <$> askRandomImage
 
-    getImages :: WaifuT m [Image]
+    getImages :: WaifuM [Image]
     getImages = ask
