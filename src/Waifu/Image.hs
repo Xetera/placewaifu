@@ -60,7 +60,7 @@ fromByteString name meta bs = Image
   , imgFormat = format
   }
   where
-    size :: (Word, Word)
+    size :: Dimensions
     size = (getMeta P.Width, getMeta P.Height)
 
     format :: String
@@ -69,16 +69,16 @@ fromByteString name meta bs = Image
       P.SourceJpeg   -> "jpeg"
       P.SourcePng    -> "png"
       P.SourceTiff   -> "tiff"
-      x -> error $ "unsupported image format " <> show x
+      x -> error $ "unsupported image format " <> show x <> " of " <> name
 
     metadata :: P.Metadatas
-    metadata = either (const $ error "could not decode image") snd (P.decodeImageWithMetadata bs)
+    metadata = either (const . error $ "could not decode image " <> name) snd (P.decodeImageWithMetadata bs)
 
     getMeta :: P.Keys a -> a
-    getMeta = maybe (error "could not read metadata") id . flip P.lookup metadata
+    getMeta = maybe (error $ "could not read metadata from " <> name) id . flip P.lookup metadata
 
 data ImageOptions = ImageOptions
-  { optSize      :: (Word, Word)
+  { optSize      :: Dimensions
   , optGreyscale :: Bool
   , optBlur      :: Bool
   }
@@ -89,7 +89,7 @@ type ImageTransform = ImageOptions -> ImageOptions
 transform :: ImageTransform -> Image -> ImageOutput
 transform f img = (img, f $ baseOptions img)
 
-resize :: (Word, Word) -> ImageTransform
+resize :: Dimensions -> ImageTransform
 resize size img = img { optSize = size }
 
 greyscale :: ImageTransform
