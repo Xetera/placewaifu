@@ -3,12 +3,12 @@ module Waifu.Server.Servant
     , SVGXML
     ) where
 
+import GHC.TypeLits
+
 import qualified Data.ByteString.Builder as BL
 import qualified Data.ByteString.Lazy as BL
 import qualified Data.Set as S
 import qualified Data.Text as T
-
-import GHC.TypeLits
 
 import Network.HTTP.Types (parseQueryText)
 import Network.Wai (Request, rawQueryString)
