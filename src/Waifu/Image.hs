@@ -5,6 +5,7 @@ module Waifu.Image
     , ImageOptions(..)
     , ImageOutput
     , ImageTransfrom
+    , Dimensions
     , transform
     , resize
     , greyscale
@@ -22,11 +23,13 @@ import qualified Data.ByteString as B
 import qualified Data.ByteString.Base64 as B
 import qualified Data.Text.Encoding as T
 
+type Dimensions = (Word, Word)
+
 data Image = Image
   { imgName   :: !String
   , imgMeta   :: !Metadata
   , imgBase64 :: !B.ByteString
-  , imgSize   :: !(Word, Word)
+  , imgSize   :: !Dimensions 
   , imgFormat :: !String
   }
 
@@ -103,21 +106,21 @@ baseOptions Image { imgSize } = ImageOptions
   }
 
 
-aspectRatio' :: Integral a => (a, a) -> Float
+aspectRatio' :: Dimensions -> Double
 aspectRatio' (x, y) = fromIntegral x / fromIntegral y
 
-aspectRatio :: Image -> Float
+aspectRatio :: Image -> Double
 aspectRatio = aspectRatio' . imgSize
 
-filterSimilarRatio :: Integral a => (a, a) -> Float -> [Image] -> [Image]
-filterSimilarRatio (x, y) ratio images = takeWhile inRange matches
+filterSimilarRatio :: Dimensions -> Double -> [Image] -> [Image]
+filterSimilarRatio dims allowedError images = takeWhile inRange matches
   where
     inRange :: Image -> Bool
     inRange img =
       let ar = aspectRatio img
           bm = aspectRatio bestMatch
-        in (bm > 1 && bm * (1 - ratio) < ar) || (bm <= 1 && bm * (1 + ratio) > ar)
-    compareAspects :: Image -> Float
-    compareAspects img = abs $ aspectRatio img - aspectRatio' (x, y)
-    matches = sortBy (comparing compareAspects) images
+        in (abs (ar - bm) / ar) < allowedError
+    distToTargetRatio :: Image -> Double
+    distToTargetRatio img = abs $ aspectRatio img - aspectRatio' dims
+    matches = sortBy (comparing distToTargetRatio) images
     bestMatch = head matches

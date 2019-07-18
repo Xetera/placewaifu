@@ -53,7 +53,7 @@ serverT = getRandomResized :<|> getRandomSquare :<|> getRandom :<|> getImages
     getRandomResized w h = withQueries $ \f -> transform (f . resize (w, h)) <$> askSimilarImage (w, h) 0.3
 
     getRandomSquare :: Word -> Queries (WaifuT m ImageOutput)
-    getRandomSquare s = withQueries $ \f -> transform (f . resize (s, s)) <$> askSimilarImage (s, s) 1
+    getRandomSquare s = withQueries $ \f -> transform (f . resize (s, s)) <$> askSimilarImage (s, s) 0.4
 
     getRandom :: Queries (WaifuT m ImageOutput)
     getRandom = withQueries $ \f -> transform f <$> askRandomImage
