@@ -1,13 +1,45 @@
 module Waifu.Server.Servant
-    ( SVGXML
+    ( QueryFlags
+    , SVGXML
     ) where
 
 import qualified Data.ByteString.Builder as BL
 import qualified Data.ByteString.Lazy as BL
+import qualified Data.Set as S
+import qualified Data.Text as T
 
+import GHC.TypeLits
+
+import Network.HTTP.Types (parseQueryText)
+import Network.Wai (Request, rawQueryString)
 import Servant
+import Servant.Server.Internal (passToServer)
 
 import Waifu.Image
+
+data QueryFlags (xs :: [Symbol])
+
+class ListSymbols (xs :: [Symbol]) where
+  listSymbols :: Proxy xs -> [String]
+
+instance ListSymbols '[] where
+  listSymbols _ = []
+
+instance (KnownSymbol x, ListSymbols xs) => ListSymbols (x ': xs) where
+  listSymbols _ = symbolVal (Proxy @x) : listSymbols (Proxy @xs)
+
+instance (HasServer api context, ListSymbols xs) => HasServer (QueryFlags xs :> api) context where
+  type ServerT (QueryFlags xs :> api) m = S.Set String -> ServerT api m
+
+  route _ context server = route (Proxy @api) context (passToServer server $ S.fromList . params (Proxy @xs))
+    where
+      params :: Proxy xs -> Request -> [String]
+      params _ r = filter (param r) $ listSymbols (Proxy @xs)
+
+      queryText r = parseQueryText $ rawQueryString r
+      param r p = maybe False (const True) $ lookup (T.pack p) (queryText r)
+
+  hoistServerWithContext _ pc nt s = hoistServerWithContext (Proxy @api) pc nt . s
 
 data SVGXML
 

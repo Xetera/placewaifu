@@ -5,16 +5,16 @@ module Waifu.Server.API
   ) where
 
 import Control.Monad.Reader
+
+import qualified Data.Set as S
+
 import Servant
 import qualified Data.Text as T
 import Waifu.Image
 import Waifu.Server.Servant
 import Waifu.Server.Stack
 
-type Queries a = Bool -> Bool -> a
-
 type ImageHeaders = Headers '[Header "Cache-Control" T.Text]
-
 type ImageResponse = ImageHeaders ImageOutput
 
 imageHeaders :: Word -> a -> ImageHeaders a
@@ -23,28 +23,30 @@ imageHeaders duration = addHeader $ "public, max-age=" <> (T.pack $ show duratio
 defaultImageHeaders :: a -> ImageHeaders a
 defaultImageHeaders = imageHeaders 86400
 
-withQueries :: (ImageTransform -> a) -> Queries a
-withQueries f x1 x2 = f
-  $ (if x1 then greyscale else id)
-  . (if x2 then blur else id)
+type TransformQueries = S.Set String
+
+fromQueries :: TransformQueries -> ImageTransform
+fromQueries = foldl (.) id . map toTransform . S.toList
+  where
+    toTransform = \case
+      "greyscale" -> greyscale
+      "blur"      -> blur
+      _           -> error "unsupported transformation"
 
 type ImageAPI
   =    "image"
     :> Capture "width" Word
     :> Capture "height" Word
-    :> QueryFlag "greyscale"
-    :> QueryFlag "blur"
+    :> QueryFlags '["greyscale", "blur"]
     :> Get '[SVGXML] ImageResponse
 
   :<|> "image"
     :> Capture "length" Word
-    :> QueryFlag "greyscale"
-    :> QueryFlag "blur"
+    :> QueryFlags '["greyscale", "blur"]
     :> Get '[SVGXML] ImageResponse
 
   :<|> "image"
-    :> QueryFlag "greyscale"
-    :> QueryFlag "blur"
+    :> QueryFlags '["greyscale", "blur"]
     :> Get '[SVGXML] ImageResponse
 
   :<|> "images"
@@ -59,14 +61,16 @@ server images = hoistServer (Proxy @ImageAPI) (runWaifuM images) serverT
 serverT :: ServerT ImageAPI WaifuM
 serverT = getRandomResized :<|> getRandomSquare :<|> getRandom :<|> getImages
   where
-    getRandomResized :: Word -> Word -> Queries (WaifuM ImageResponse)
-    getRandomResized w h = withQueries $ \f -> defaultImageHeaders . transform (f . resize (w, h)) <$> askSimilarImage (w, h) 0.3
 
-    getRandomSquare :: Word -> Queries (WaifuM ImageResponse)
-    getRandomSquare s = withQueries $ \f -> defaultImageHeaders . transform (f . resize (s, s)) <$> askSimilarImage (s, s) 0.4
+    getRandomResized :: Word -> Word -> TransformQueries -> WaifuM ImageResponse
+    getRandomResized w h qs = defaultImageHeaders . transform (fromQueries qs . resize (w, h)) <$> askSimilarImage (w, h) 0.3
 
-    getRandom :: Queries (WaifuM ImageResponse)
-    getRandom = withQueries $ \f -> defaultImageHeaders . transform f <$> askRandomImage
+    getRandomSquare :: Word -> TransformQueries -> WaifuM ImageResponse
+    getRandomSquare s qs = defaultImageHeaders . transform (fromQueries qs . resize (s, s)) <$> askSimilarImage (s, s) 0.4
+
+    getRandom :: TransformQueries -> WaifuM ImageResponse
+    getRandom qs = defaultImageHeaders . transform (fromQueries qs) <$> askRandomImage
 
     getImages :: WaifuM [Image]
     getImages = ask
+  

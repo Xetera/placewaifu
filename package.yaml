@@ -16,7 +16,9 @@ dependencies:
   - base
   - base64-bytestring
   - bytestring
+  - containers
   - filepath
+  - http-types
   - JuicyPixels
   - mtl
   - random
