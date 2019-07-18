@@ -10,8 +10,11 @@ module Waifu.Image
     , greyscale
     , blur
     , baseOptions
+    , filterSimilarRatio
     ) where
 
+import Data.List
+import Data.Ord
 import qualified Codec.Picture as P
 import qualified Codec.Picture.Metadata as P
 import Data.Aeson
@@ -98,3 +101,23 @@ baseOptions Image { imgSize } = ImageOptions
   , optGreyscale = False
   , optBlur      = False
   }
+
+
+aspectRatio' :: Integral a => (a, a) -> Float
+aspectRatio' (x, y) = fromIntegral x / fromIntegral y
+
+aspectRatio :: Image -> Float
+aspectRatio = aspectRatio' . imgSize
+
+filterSimilarRatio :: Integral a => (a, a) -> Float -> [Image] -> [Image]
+filterSimilarRatio (x, y) ratio images = takeWhile inRange matches
+  where
+    inRange :: Image -> Bool
+    inRange img =
+      let ar = aspectRatio img
+          bm = aspectRatio bestMatch
+        in (bm > 1 && bm * (1 - ratio) < ar) || (bm <= 1 && bm * (1 + ratio) > ar)
+    compareAspects :: Image -> Float
+    compareAspects img = abs $ aspectRatio img - aspectRatio' (x, y)
+    matches = sortBy (comparing compareAspects) images
+    bestMatch = head matches

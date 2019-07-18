@@ -4,6 +4,7 @@ module Waifu.Server.Stack
     , runWaifuT
     , runSetupT
     , askRandomImage
+    , askSimilarImage
     , loadImages
     ) where
 
@@ -27,6 +28,9 @@ runWaifuT images f = runReaderT f images
 
 askRandomImage :: MonadIO m => WaifuT m Image
 askRandomImage = ask >>= randomList
+
+askSimilarImage :: (Integral a, MonadIO m) => (a, a) -> Float -> WaifuT m Image
+askSimilarImage dims ratio = asks (filterSimilarRatio dims ratio) >>= randomList
 
 runSetupT :: FilePath -> SetupT m a -> m a
 runSetupT assets f = runReaderT f assets

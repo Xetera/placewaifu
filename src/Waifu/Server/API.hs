@@ -50,10 +50,10 @@ serverT :: forall m. (MonadIO m, MonadError ServantErr m) => ServerT ImageAPI (W
 serverT = getRandomResized :<|> getRandomSquare :<|> getRandom :<|> getImages
   where
     getRandomResized :: Word -> Word -> Queries (WaifuT m ImageOutput)
-    getRandomResized w h = withQueries $ \f -> transform (f . resize (w, h)) <$> askRandomImage
+    getRandomResized w h = withQueries $ \f -> transform (f . resize (w, h)) <$> askSimilarImage (w, h) 0.3
 
     getRandomSquare :: Word -> Queries (WaifuT m ImageOutput)
-    getRandomSquare s = withQueries $ \f -> transform (f . resize (s, s)) <$> askRandomImage
+    getRandomSquare s = withQueries $ \f -> transform (f . resize (s, s)) <$> askSimilarImage (s, s) 1
 
     getRandom :: Queries (WaifuT m ImageOutput)
     getRandom = withQueries $ \f -> transform f <$> askRandomImage
