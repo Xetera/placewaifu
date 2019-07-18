@@ -35,12 +35,14 @@ default-extensions:
   - BlockArguments
   - ConstraintKinds
   - DataKinds
+  - DerivingStrategies
   - DeriveFunctor
   - DeriveGeneric
   - FlexibleContexts
   - FlexibleInstances
   - FunctionalDependencies
   - GADTs
+  - GeneralizedNewtypeDeriving
   - LambdaCase
   - MultiParamTypeClasses
   - MultiWayIf
@@ -50,6 +52,7 @@ default-extensions:
   - PolyKinds
   - RankNTypes
   - ScopedTypeVariables
+  - StandaloneDeriving
   - TupleSections
   - TypeApplications
   - TypeOperators

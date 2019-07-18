@@ -4,7 +4,7 @@ module Waifu.Image
     , fromByteString
     , ImageOptions(..)
     , ImageOutput
-    , ImageTransfrom
+    , ImageTransform
     , Dimensions
     , transform
     , resize
@@ -84,18 +84,18 @@ data ImageOptions = ImageOptions
   }
 
 type ImageOutput = (Image, ImageOptions)
-type ImageTransfrom = ImageOptions -> ImageOptions
+type ImageTransform = ImageOptions -> ImageOptions
 
-transform :: ImageTransfrom -> Image -> ImageOutput
+transform :: ImageTransform -> Image -> ImageOutput
 transform f img = (img, f $ baseOptions img)
 
-resize :: (Word, Word) -> ImageTransfrom
+resize :: (Word, Word) -> ImageTransform
 resize size img = img { optSize = size }
 
-greyscale :: ImageTransfrom
+greyscale :: ImageTransform
 greyscale img = img { optGreyscale = True }
 
-blur :: ImageTransfrom
+blur :: ImageTransform
 blur img = img { optBlur = True }
 
 baseOptions :: Image -> ImageOptions
@@ -105,22 +105,23 @@ baseOptions Image { imgSize } = ImageOptions
   , optBlur      = False
   }
 
-
-aspectRatio' :: Dimensions -> Double
-aspectRatio' (x, y) = fromIntegral x / fromIntegral y
-
 aspectRatio :: Image -> Double
 aspectRatio = aspectRatio' . imgSize
 
+aspectRatio' :: Dimensions -> Double
+aspectRatio' (w, h) = fromIntegral w / fromIntegral h
+
 filterSimilarRatio :: Dimensions -> Double -> [Image] -> [Image]
-filterSimilarRatio dims allowedError images = takeWhile inRange matches
+filterSimilarRatio size allowedError images = takeWhile inRange matches
   where
     inRange :: Image -> Bool
     inRange img =
       let ar = aspectRatio img
           bm = aspectRatio bestMatch
-        in (abs (ar - bm) / ar) < allowedError
+      in abs (ar - bm) / ar < allowedError
+
     distToTargetRatio :: Image -> Double
-    distToTargetRatio img = abs $ aspectRatio img - aspectRatio' dims
+    distToTargetRatio img = abs $ aspectRatio img - aspectRatio' size
+
     matches = sortBy (comparing distToTargetRatio) images
     bestMatch = head matches
