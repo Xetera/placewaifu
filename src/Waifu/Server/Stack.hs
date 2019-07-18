@@ -23,6 +23,7 @@ type WaifuT m = ReaderT [Image] m
 
 type SetupT m = ReaderT FilePath m
 
+
 runWaifuT :: MonadIO m => [Image] -> WaifuT m a -> m a
 runWaifuT images f = runReaderT f images
 
@@ -31,6 +32,9 @@ askRandomImage = ask >>= randomList
 
 askSimilarImage :: MonadIO m => Dimensions -> Double -> WaifuT m Image
 askSimilarImage dims ratio = asks (filterSimilarRatio dims ratio) >>= randomList
+
+-- withImageResponse :: MonadIO m => WaifuT m Image
+-- withImageResponse = 
 
 runSetupT :: FilePath -> SetupT m a -> m a
 runSetupT assets f = runReaderT f assets
