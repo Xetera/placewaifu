@@ -21,7 +21,6 @@ RUN cd web && npm run build
 
 FROM ubuntu
 
-
 COPY --from=build /root/.local/bin/placewaifu .
 COPY --from=build /opt/server/web/dist ./web/dist
 COPY ./assets ./assets
