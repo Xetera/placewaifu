@@ -1,8 +1,14 @@
 extends template.pug
 block body
-  script(src="https://unpkg.com/masonry-layout@4/dist/masonry.pkgd.min.js")
-block content
-  h1.title All images
-  a(href="/") Back home
-  .images Loading...
-  script(src="../js/image_list.js")
+  script(src="https://unpkg.com/isotope-layout@3/dist/isotope.pkgd.min.js")
+  script(src="https://unpkg.com/imagesloaded@4/imagesloaded.pkgd.min.js")
+
+  .section
+    .container
+      .columns.is-centered
+        .column.is-centered
+          h1.title All images
+          a(href="/") Back home
+          .images-container
+            .images Loading...
+          script(src="../js/image_list.js")

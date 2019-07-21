@@ -38,14 +38,42 @@ h1 {
     z-index: 2;
   }
 }
-
-.image {
-  display: block;
-  margin-left: auto;
-  margin-right: auto;
-  width: 50%;
+.images-container {
+  margin: 0 auto;
 }
 
+.images {
+  margin: 0 auto;
+}
+
+.image {
+  width: 300px;
+  position: relative;
+}
+
+.image-info {
+  position: absolute;
+  bottom: 0;
+  width: 100%;
+  padding: 8px;
+  display: flex;
+  justify-content: space-between;
+  background: rgba(0, 0, 0, 0.5);
+}
+
+.image-name {
+  color: white;
+  max-width: 80%;
+  text-overflow: ellipsis;
+  overflow: hidden;
+}
+
+.image-source {
+  color: rgb(59, 191, 231);
+}
+.image-source:hover {
+  color: rgb(44, 160, 196);
+}
 .float-left {
   float: left;
 }
