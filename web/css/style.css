@@ -38,3 +38,18 @@ h1 {
     z-index: 2;
   }
 }
+
+.image {
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
+  width: 50%;
+}
+
+.float-left {
+  float: left;
+}
+
+.float-right {
+  float: right;
+}

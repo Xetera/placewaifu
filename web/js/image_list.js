@@ -6,16 +6,16 @@ var msnry = new Masonry(dest, {
 fetch("/images")
   .then(res => res.json())
   .then(images => {
-    const elems = images.map(
+    const elems = images.sort((x, y) => x.name.localeCompare(y.name)).map(
       image =>
         `
         <div class="card">
           <div class="card-image">
-            <img src="data:image/png;base64, ${image.data}">
+            <img class="image" src="data:image/${image.format};base64, ${image.data}">
           </div>
           <div class="card-content">
-            <p class="bold">${image.name}</p>
-            <a class="is-6" href="${image.source}">To source</a>
+            <p class="float-left">${image.name}</p>
+            <a class="float-right is-6" href="${image.source}">source</a>
           </div>
         </div>
       `
