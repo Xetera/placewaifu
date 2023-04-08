@@ -1,0 +1,14 @@
+---
+- hosts: all
+  vars:
+    app: placewaifu
+    dokku_manage_nginx: false
+  roles:
+    - role: dokku_bot.ansible_dokku
+  tasks:
+    - name: Setting domains
+      dokku_domains:
+        app: "{{ app }}"
+        domains:
+          - test.placewaifu.com
+        state: present
