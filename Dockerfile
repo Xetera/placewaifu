@@ -12,7 +12,7 @@ ENV LC_ALL en_US.UTF-8
 
 COPY package.yaml stack.yaml* ./
 # COPY .stack-work ./stack-work
-RUN stack build --resolver ghc-9.2.7 --only-dependencies
+RUN stack build --resolver lts-20.17 --only-dependencies
 
 COPY ./ ./
 RUN stack install

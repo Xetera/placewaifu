@@ -2,7 +2,6 @@
 - hosts: all
   vars:
     app: placewaifu
-    dokku_manage_nginx: false
   roles:
     - role: dokku_bot.ansible_dokku
   tasks:
@@ -10,5 +9,9 @@
       dokku_domains:
         app: "{{ app }}"
         domains:
-          - test.placewaifu.com
-        state: present
+          - placewaifu.com
+    - name: Setting ports
+      dokku_ports:
+        app: "{{ app }}"
+        mappings:
+          - http:80:1234
