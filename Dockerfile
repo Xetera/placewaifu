@@ -1,4 +1,4 @@
-FROM haskell:8.6.5 as build
+FROM haskell:9.2.7 as build
 
 WORKDIR /opt/server
 RUN apt-get clean && apt-get update
@@ -10,14 +10,14 @@ ENV LANG en_US.UTF-8
 ENV LANGUAGE en_US:en
 ENV LC_ALL en_US.UTF-8
 
-COPY placewaifu.cabal package.yaml stack.yaml* ./
-COPY .stack-work ./stack-work
-RUN stack install --only-dependencies
+COPY package.yaml stack.yaml* ./
+# COPY .stack-work ./stack-work
+RUN stack build --resolver ghc-9.2.7 --only-dependencies
 
 COPY ./ ./
 RUN stack install
 
-RUN cd web && npm run build
+RUN cd web && npm i && npm run build
 
 FROM ubuntu
 
