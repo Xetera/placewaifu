@@ -3,7 +3,7 @@ version: 0.1.0.0
 github: "Xetera/placewaifu"
 license: MIT
 author: "Xetera"
-copyright: "2019 Xetera"
+copyright: "2023 Xetera"
 
 extra-source-files:
   - README.md
