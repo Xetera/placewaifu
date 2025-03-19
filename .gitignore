@@ -2,6 +2,6 @@
 dist-newstyle
 .vscode
 
-web/.cache
+web/.parcel-cache
 web/node_modules
 web/dist

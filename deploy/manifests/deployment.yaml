@@ -1,0 +1,39 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: placewaifu
+spec:
+  selector:
+    matchLabels:
+      app: placewaifu
+  template:
+    metadata:
+      labels:
+        app: placewaifu
+    spec:
+      containers:
+        - name: placewaifu
+          image: ghcr.io/xetera/placewaifu:latest
+          imagePullPolicy: Always
+          resources:
+            limits:
+              memory: "128Mi"
+              cpu: "100m"
+          ports:
+            - containerPort: 3000
+          env:
+            - name: OTEL_EXPORTER_OTLP_ENDPOINT
+              value: "http://alloy.monitoring.svc.cluster.local:4318"
+            - name: DATABASE_URL
+              valueFrom:
+                secretKeyRef:
+                  name: me-db-url
+                  key: DATABASE_URL
+          volumeMounts:
+            - name: me-config
+              mountPath: /app/config.toml
+              subPath: config.toml
+      volumes:
+        - name: me-config
+          secret:
+            secretName: me-config
