@@ -39,5 +39,5 @@ COPY ./assets ./assets
 
 USER nobody
 
-EXPOSE 3000
+EXPOSE 1234
 CMD ["./placewaifu", "--assets=./assets"]

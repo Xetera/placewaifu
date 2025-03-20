@@ -1,0 +1,19 @@
+apiVersion: traefik.io/v1alpha1
+kind: IngressRoute
+metadata:
+  name: placewaifu
+spec:
+  entryPoints:
+    - websecure
+  routes:
+    - match: Host(`placewaifu.com`)
+      priority: 10
+      services:
+        - name: placewaifu
+          port: 1234
+      middlewares:
+        - name: ingress-cloudflare-only@kubernetescrd
+  tls:
+    options:
+      name: ingress-cloudflare-mtls@kubernetescrd
+    secretName: cloudflare-origin-placewaifu.com

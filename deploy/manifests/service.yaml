@@ -1,0 +1,10 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: placewaifu
+spec:
+  selector:
+    app: placewaifu
+  ports:
+    - port: 1234
+      targetPort: 1234
