@@ -26,10 +26,13 @@ ENV LANGUAGE=en_US:en
 ENV LC_ALL=en_US.UTF-8
 
 COPY package.yaml placewaifu.cabal ./
-RUN --mount=type=cache,id=cabal-deps,target=/root/.cabal cabal build --only-dependencies -j4
+RUN --mount=type=cache,target=/root/.local/state/cabal/store \
+    --mount=type=cache,target=/root/.cache/cabal \
+    --mount=type=cache,target=./dist-newstyle \
+    cabal update && cabal build --only-dependencies -j4
 
 COPY ./ ./
-RUN --mount=type=cache,id=cabal,target=/root/.cabal cabal install
+RUN cabal install
 
 FROM ubuntu
 

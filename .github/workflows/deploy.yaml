@@ -33,6 +33,8 @@ jobs:
           context: .
           file: Dockerfile
           platforms: linux/arm64
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
           push: true
           tags: |
             ghcr.io/xetera/placewaifu:${{ env.placewaifu_version }}
