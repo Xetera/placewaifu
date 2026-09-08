@@ -12,7 +12,7 @@ RUN --mount=type=cache,id=npm,target=/root/.npm npm ci
 
 RUN npm run build
 
-FROM haskell:9.10-slim-bullseye AS build
+FROM haskell:9.10-slim-bookworm AS build
 
 WORKDIR /opt/server
 
